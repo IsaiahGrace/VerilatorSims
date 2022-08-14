@@ -19,6 +19,7 @@ include_directories(cpp)
 
 add_executable(hdl
   cpp/counter/counter.cpp
+  cpp/RF/RF.cpp
   cpp/main.cpp
 )
 
@@ -29,11 +30,14 @@ target_link_libraries(hdl
 include(GoogleTest)
 gtest_discover_tests(hdl)
 
-set(verilog_sources
-  sv/counter/counter.sv
-  )
-
 # For info: https://verilator.org/guide/latest/verilating.html
+# We need one verilate call for each "top level" module we would like to simulate
 verilate(hdl
-  SOURCES ${verilog_sources}
+  INCLUDE_DIRS "sv"
+  SOURCES sv/counter/counter.sv
+)
+
+verilate(hdl
+  INCLUDE_DIRS "sv"
+  SOURCES sv/RF/RF.sv
 )
