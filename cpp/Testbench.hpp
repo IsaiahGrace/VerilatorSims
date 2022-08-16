@@ -1,36 +1,46 @@
+#ifndef CPP_TESTBENCH_HPP_
+#define CPP_TESTBENCH_HPP_
+
 #include <cstdint>
 #include <iostream>
+#include <string>
 
+#include "gtest/gtest.h"
 #include "verilated.h"
 #include "verilated_vcd_c.h"
 
 // Thank you ZipCPU!
 // https://zipcpu.com/blog/2017/06/21/looking-at-verilator.html
 
-template<class Module> class Testbench {
- private:
+// This testbench assumes that the Module has "clk" and "nrst" signals.
+
+template<class Module>
+class Testbench: public ::testing::Test {
+ protected:
     VerilatedContext* context;
     VerilatedVcdC* vcd;
-    std::string traceFile;
-
- public:
-    uint64_t tickCount;
     Module* dev;
 
-    Testbench(const std::string& testName) {
+    std::string traceFile;
+    uint64_t tickCount;
+
+    void SetUp() override {
         context = new VerilatedContext;
         context->traceEverOn(true);
-        context->debug(0);
 
         dev = new Module(context);
-
         vcd = new VerilatedVcdC;
-
         dev->trace(vcd, 99);
 
+        // We'll create a .vcd file for each unit test, and name it traces/testSuite-testName.vcd
+        const testing::TestInfo* const test_info = testing::UnitTest::GetInstance()->current_test_info();
+        std::ostringstream testName;
+        testName << "traces/" << test_info->test_suite_name() << "-" << test_info->name() << ".vcd";
+        traceFile = testName.str();
+
+        // VerilatedVcdC uses the const char* later at varius points! We need to ensure that the
+        // pointer is valid for the life of vcd!
         // NOTE: open() MUST be called AFTER trace(), otherwise, dump() below segfaults...
-        // VerilatedVcdC uses the const char* later at varius points! We need to ensure that the pointer is valid for the life of vcd!
-        traceFile = "traces/" + testName + ".vcd";
         vcd->open(traceFile.c_str());
 
         // Generate a trace at the begining of time.
@@ -41,7 +51,7 @@ template<class Module> class Testbench {
         tickCount = 0;
     }
 
-    virtual ~Testbench() {
+    void TearDown() override {
         // Evaluate and log the traces at the end of time
         dev->eval();
         vcd->dump(context->time());
@@ -86,6 +96,8 @@ template<class Module> class Testbench {
     }
 
     bool done() {
-        return Verilated::gotFinish();
+        return context->gotFinish();
     }
 };
+
+#endif  // CPP_TESTBENCH_HPP_
