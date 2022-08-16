@@ -1,3 +1,7 @@
+#include <cstdint>
+#include <sstream>
+#include <vector>
+
 #include "verilated.h"
 #include "gtest/gtest.h"
 
@@ -8,13 +12,37 @@
 class RF: public ::testing::Test {
  protected:
     Testbench<VRF>* tb;
+
     void SetUp() override {
-         tb = new Testbench<VRF>;
+        const testing::TestInfo* const test_info = testing::UnitTest::GetInstance()->current_test_info();
+        std::ostringstream testName;
+        testName << test_info->test_suite_name() << "-" << test_info->name();
+        tb = new Testbench<VRF>(testName.str());
     }
 
     void TearDown() override {
+        // One final tick, just to make the waveform traces readable.
+        tb->tick();
+
         delete tb;
         tb = nullptr;
+    }
+
+    struct RFInput {
+        uint8_t write;
+        uint8_t swap;
+        uint8_t save;
+        uint8_t write_data;
+        uint8_t expect_acc;
+    };
+
+    void applyInput(const RFInput& inputs) {
+        tb->dev->write = inputs.write;
+        tb->dev->swap = inputs.swap;
+        tb->dev->save = inputs.save;
+        tb->dev->write_data = inputs.write_data;
+        tb->tick();
+        EXPECT_EQ(inputs.expect_acc, tb->dev->acc);
     }
 };
 
@@ -25,80 +53,70 @@ TEST_F(RF, resetACC) {
 
 TEST_F(RF, resetBAK) {
     tb->reset();
-    tb->dev->swap = 1;
-    tb->tick();
-    EXPECT_EQ(tb->dev->acc, 0);
+
+    applyInput({
+        .write=0,
+        .swap=1,
+        .save=0,
+        .write_data=0xff,
+        .expect_acc=0x00
+    });
 }
 
 TEST_F(RF, writeACC) {
     tb->reset();
 
-    tb->dev->write = 1;
-    tb->dev->write_data = 0xaa;
-
-    tb->tick();
-
-    EXPECT_EQ(tb->dev->acc, 0xaa);
+    applyInput({
+        .write=1,
+        .swap=0,
+        .save=0,
+        .write_data=0xaa,
+        .expect_acc=0xaa
+    });
 }
 
 TEST_F(RF, swap) {
     tb->reset();
 
-    tb->dev->write = 1;
-    tb->dev->write_data = 0xaa;
+    applyInput({
+        .write=1,
+        .swap=0,
+        .save=0,
+        .write_data=0xaa,
+        .expect_acc=0xaa
+    });
 
-    tb->tick();
-    EXPECT_EQ(tb->dev->acc, 0xaa);
+    applyInput({
+        .write=0,
+        .swap=1,
+        .save=0,
+        .write_data=0xff,
+        .expect_acc=0x00
+    });
 
-    tb->dev->write = 0;
-    tb->dev->swap = 1;
-
-    tb->tick();
-    EXPECT_EQ(tb->dev->acc, 0x00);
-
-    // swap is still active!
-
-    tb->tick();
-    EXPECT_EQ(tb->dev->acc, 0xaa);
+    applyInput({
+        .write=0,
+        .swap=1,
+        .save=0,
+        .write_data=0xff,
+        .expect_acc=0xaa
+    });
 }
 
 TEST_F(RF, save) {
     tb->reset();
-    EXPECT_EQ(tb->dev->acc, 0x00);
 
-    // Write 0xaa to ACC
-    tb->dev->write = 1;
-    tb->dev->write_data = 0xaa;
+    std::vector<RFInput> inputs = {
+        {.write=1, .swap=0, .save=0, .write_data=0xaa, .expect_acc=0xaa},  // Write 0xaa to ACC
+        {.write=0, .swap=1, .save=0, .write_data=0xff, .expect_acc=0x00},  // Swap ACC and BAK
+        {.write=1, .swap=0, .save=0, .write_data=0xbb, .expect_acc=0xbb},  // Write 0xbb to ACC
+        {.write=0, .swap=0, .save=1, .write_data=0xff, .expect_acc=0xbb},  // Save ACC to BAK
+        {.write=1, .swap=0, .save=0, .write_data=0xaa, .expect_acc=0xaa},  // Write 0xaa to ACC
+        {.write=0, .swap=1, .save=0, .write_data=0xff, .expect_acc=0xbb},  // SWAP ACC and BAK (so we can verify save)
+        {.write=0, .swap=1, .save=0, .write_data=0xff, .expect_acc=0xaa},  // SWAP ACC and BAK (again! for fun.)
+    };
 
-    tb->tick();
-    EXPECT_EQ(tb->dev->acc, 0xaa);
-
-    // Swap ACC and BAK
-    tb->dev->write = 0;
-    tb->dev->swap = 1;
-
-    tb->tick();
-    EXPECT_EQ(tb->dev->acc, 0x00);
-
-    // Write 0xbb to ACC
-    tb->dev->swap = 0;
-    tb->dev->write = 1;
-    tb->dev->write_data = 0xbb;
-
-    tb->tick();
-    EXPECT_EQ(tb->dev->acc, 0xbb);
-
-    // Save ACC to BAK
-    tb->dev->write = 0;
-    tb->dev->save = 1;
-
-    tb->tick();
-    EXPECT_EQ(tb->dev->acc, 0xbb);
-
-    // SWAP ACC and BAK (so we can verify save)
-    tb->dev->save = 0;
-    tb->dev->swap = 1;
-
-    tb->tick();
-    EXPECT_EQ(tb->dev->acc, 0xbb);
+    for (const auto& input : inputs) {
+        applyInput(input);
+    }
 }

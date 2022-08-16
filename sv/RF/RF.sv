@@ -1,3 +1,4 @@
+`timescale 10ns/10ns
 `include "types.sv"
 
 // A simple 2 word register file for the TIS-100 arch.

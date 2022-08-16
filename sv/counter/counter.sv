@@ -1,3 +1,5 @@
+`timescale 10ns/10ns
+
 module counter (
     input logic clk, nrst,
     output logic [7:0] count

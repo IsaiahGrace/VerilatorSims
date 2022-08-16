@@ -8,8 +8,12 @@
 class Counter: public ::testing::Test {
  protected:
     Testbench<Vcounter>* tb;
+
     void SetUp() override {
-         tb = new Testbench<Vcounter>;
+        const testing::TestInfo* const test_info = testing::UnitTest::GetInstance()->current_test_info();
+        std::ostringstream testName;
+        testName << "traces/" << test_info->test_suite_name() << "-" << test_info->name() << ".vcd";
+        tb = new Testbench<Vcounter>(testName.str());
     }
 
     void TearDown() override {
