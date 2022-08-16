@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(hdl)
 
-set(CMAKE_CXX_STANDARD 20)
+Set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVL_DEBUG")
@@ -22,6 +22,7 @@ include_directories(cpp)
 add_executable(hdl
   /usr/share/verilator/include/verilated_vcd_c.cpp
   cpp/counter/counter.cpp
+  cpp/icache/icache.cpp
   cpp/main.cpp
   cpp/RF/RF.cpp
 )
@@ -39,9 +40,10 @@ gtest_discover_tests(hdl)
 # These are top level modules
 set(sv_counter "sv/counter/counter.sv")
 set(sv_RF "sv/RF/RF.sv")
+set(sv_icache "sv/icache/icache.sv")
 
 # This is a single list of all top level modules, so we can iterate over it below
-set(sv_top_modules ${sv_counter} ${sv_RF})
+set(sv_top_modules ${sv_counter} ${sv_RF} ${sv_icache})
 
 foreach(sv_top ${sv_top_modules})
   verilate(hdl
