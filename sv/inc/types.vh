@@ -1,3 +1,6 @@
+`ifndef _TYPES_VH_
+`define _TYPES_VH_
+
 // These are the types used by the TIS-100 CPU tiles
 `timescale 10ns/10ns
 
@@ -57,3 +60,5 @@ typedef struct packed {
         address label;
     } data;
 } instruction;
+
+`endif // _TYPES_VH_
