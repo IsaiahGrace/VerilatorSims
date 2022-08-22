@@ -50,5 +50,6 @@ foreach(sv_top ${sv_top_modules})
     INCLUDE_DIRS "sv"
     SOURCES ${sv_top}
     TRACE
+    VERILATOR_ARGS "--Wall"
   )
 endforeach()

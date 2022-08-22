@@ -1,7 +1,0 @@
-`timescale 10ns/10ns
-`include "types.sv"
-
-module icache (
-               input wire clk, nrst,
-               input wire addr,
-               input wire write_data,
