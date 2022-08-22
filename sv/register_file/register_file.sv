@@ -1,7 +1,7 @@
 `include "types.vh"
 
 // A simple 2 word register file for the TIS-100 arch.
-module RF (
+module register_file (
     input logic clk, nrst,
     input logic write, swap, save,
     input word write_data,

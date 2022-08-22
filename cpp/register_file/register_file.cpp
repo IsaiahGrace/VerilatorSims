@@ -7,16 +7,16 @@
 
 #include "Testbench.hpp"
 
-#include "VRF.h"
+#include "Vregister_file.h"
 
-class RF: public Testbench<VRF> {
+class register_file: public Testbench<Vregister_file> {
  protected:
     void SetUp() override {
-        Testbench<VRF>::SetUp();
+        Testbench<Vregister_file>::SetUp();
     }
 
     void TearDown() override {
-        Testbench<VRF>::TearDown();
+        Testbench<Vregister_file>::TearDown();
     }
 
     struct RFInput {
@@ -43,12 +43,12 @@ class RF: public Testbench<VRF> {
     }
 };
 
-TEST_F(RF, resetACC) {
+TEST_F(register_file, resetACC) {
     reset();
     EXPECT_EQ(dev->acc, 0);
 }
 
-TEST_F(RF, resetBAK) {
+TEST_F(register_file, resetBAK) {
     reset();
 
     applyInputs({
@@ -56,7 +56,7 @@ TEST_F(RF, resetBAK) {
     });
 }
 
-TEST_F(RF, writeACC) {
+TEST_F(register_file, writeACC) {
     reset();
 
     applyInputs({
@@ -64,7 +64,7 @@ TEST_F(RF, writeACC) {
     });
 }
 
-TEST_F(RF, swap) {
+TEST_F(register_file, swap) {
     reset();
 
     applyInputs({
@@ -74,7 +74,7 @@ TEST_F(RF, swap) {
     });
 }
 
-TEST_F(RF, save) {
+TEST_F(register_file, save) {
     reset();
 
     applyInputs({

@@ -24,7 +24,7 @@ add_executable(hdl
   cpp/counter/counter.cpp
   cpp/icache/icache.cpp
   cpp/main.cpp
-  cpp/RF/RF.cpp
+  cpp/register_file/register_file.cpp
 )
 
 target_link_libraries(hdl
@@ -38,12 +38,12 @@ gtest_discover_tests(hdl)
 # We need one verilate call for each "top level" module we would like to simulate
 
 # These are top level modules
-set(sv_counter "sv/counter/counter.sv")
-set(sv_RF "sv/RF/RF.sv")
-set(sv_icache "sv/icache/icache.sv")
+set(sv_counter       "sv/counter/counter.sv")
+set(sv_register_file "sv/register_file/register_file.sv")
+set(sv_icache        "sv/icache/icache.sv")
 
 # This is a single list of all top level modules, so we can iterate over it below
-set(sv_top_modules ${sv_counter} ${sv_RF} ${sv_icache})
+set(sv_top_modules ${sv_counter} ${sv_register_file} ${sv_icache})
 
 foreach(sv_top ${sv_top_modules})
   verilate(hdl
