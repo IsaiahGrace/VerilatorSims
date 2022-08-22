@@ -1,19 +1,19 @@
-`timescale 10ns/10ns
 `include "types.sv"
 
 module icache (
-               input wire clk, nrst,
+   input wire clk, nrst,
 
-               // Write signals
-               input wire write,
-               input      address write_addr,
-               input      word write_data,
+   // Write signals
+   input wire write,
+   input address write_addr,
+   input instruction write_data,
 
-               // Read signals
-               input      address read_addr,
-               output     word read_data
-               );
-   word[31:0] i_data, nxt_i_data;
+   // Read signals
+   input  address read_addr,
+   output instruction read_data
+   );
+
+   instruction[31:0] i_data, nxt_i_data;
 
    assign read_data = i_data[read_addr];
 
@@ -22,7 +22,7 @@ module icache (
       if (write) begin
          nxt_i_data[write_addr] = write_data;
       end
-   end
+   end // always_comb
 
    always_ff @(posedge clk, negedge nrst) begin
       if (!nrst) begin
@@ -31,6 +31,6 @@ module icache (
       else begin
          i_data <= nxt_i_data;
       end
-   end
+   end // always_ff @(posedge clk, negedge nrst)
 endmodule // icache
 

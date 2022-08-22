@@ -31,9 +31,9 @@ class IcacheModel {
     uint8_t read(uint8_t read_addr) {
         return data[read_addr];
     }
-        
+
  private:
-    std::array<uint8_t, 32> data;   
+    std::array<uint8_t, 32> data;
 };
 
 class Icache: public Testbench<Vicache> {
@@ -49,9 +49,9 @@ class Icache: public Testbench<Vicache> {
     struct IcacheInput {
         uint8_t write;
         uint8_t write_addr;
-        uint8_t write_data;
+        uint16_t write_data;
         uint8_t read_addr;
-        std::optional<uint8_t> expect_read_data;
+        std::optional<uint16_t> expect_read_data;
     };
 
     void applyInput(const IcacheInput& input) {
@@ -60,14 +60,15 @@ class Icache: public Testbench<Vicache> {
         dev->write_data = input.write_data;
         dev->read_addr = input.read_addr;
 
+        // The read_data is combinational, so we need to evaluate and test the data before the rising edge of the clock
         dev->eval();
 
         // If we want to verify the outputs, do so now.
         if (input.expect_read_data) {
-            EXPECT_EQ(input.expect_read_data.value(), dev->read_data) << "read_addr = " << input.read_addr;
+            EXPECT_EQ(input.expect_read_data.value(), dev->read_data) << "read_addr = " << input.read_addr << " read_data = " << std::hex << dev->read_data;
         }
 
-        tick();        
+        tick();
     }
 
     void applyInputs(const std::vector<IcacheInput>& inputs) {
@@ -94,4 +95,11 @@ TEST_F(Icache, readAndWrite) {
     }
 
     applyInput({.write = 0, .write_addr = 0x00, .write_data = 0x00, .read_addr = 31, .expect_read_data = 31});
+}
+
+TEST_F(Icache, writeLargeData) {
+    reset();
+    // NOTE: We write 0xffff, but we read 0x7fff, this is because the instruction type in SV is 15 bits, but in C++ we have a 16bit word for that port.
+    applyInput({.write = 1, .write_addr = 0x00, .write_data = 0xffff, .read_addr = 0x00, .expect_read_data = 0x0000});
+    applyInput({.write = 0, .write_addr = 0x00, .write_data = 0x0000, .read_addr = 0x00, .expect_read_data = 0x7fff});
 }
