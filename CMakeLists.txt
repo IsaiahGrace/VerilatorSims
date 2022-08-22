@@ -47,7 +47,7 @@ set(sv_top_modules ${sv_counter} ${sv_RF} ${sv_icache})
 
 foreach(sv_top ${sv_top_modules})
   verilate(hdl
-    INCLUDE_DIRS "sv"
+    INCLUDE_DIRS "sv/inc"
     SOURCES ${sv_top}
     TRACE
     VERILATOR_ARGS "--Wall"

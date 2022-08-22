@@ -1,4 +1,4 @@
-`include "types.sv"
+`include "types.vh"
 
 module icache (
    input wire clk, nrst,
