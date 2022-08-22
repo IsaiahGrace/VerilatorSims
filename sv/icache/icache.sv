@@ -1,10 +1,10 @@
 `include "types.vh"
 
 module icache (
-   input wire clk, nrst,
+   input logic clk, nrst,
 
    // Write signals
-   input wire write,
+   input logic write,
    input address write_addr,
    input instruction write_data,
 
