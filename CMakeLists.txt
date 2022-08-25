@@ -27,7 +27,7 @@ add_executable(hdl
   cpp/register_file.cpp
 )
 
-target_link_libraries(hdl
+target_link_libraries(hdl PUBLIC
   GTest::gtest_main
 )
 
