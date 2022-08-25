@@ -41,15 +41,16 @@ gtest_discover_tests(hdl)
 set(sv_counter       "sv/counter/counter.sv")
 set(sv_register_file "sv/register_file/register_file.sv")
 set(sv_icache        "sv/icache/icache.sv")
+set(sv_tile_top      "sv/tile/tile_top.sv" "sv/tile/tile.sv" ${sv_icache} ${sv_register_file})
 
 # This is a single list of all top level modules, so we can iterate over it below
-set(sv_top_modules ${sv_counter} ${sv_register_file} ${sv_icache})
+set(sv_top_modules sv_counter sv_register_file sv_icache sv_tile_top)
 
 foreach(sv_top ${sv_top_modules})
   verilate(hdl
     INCLUDE_DIRS "sv/inc"
-    SOURCES ${sv_top}
+    SOURCES ${${sv_top}}
     TRACE
-    VERILATOR_ARGS "--Wall"
+    #VERILATOR_ARGS "--Wall"  # TODO: re-enable -Wall
   )
 endforeach()
