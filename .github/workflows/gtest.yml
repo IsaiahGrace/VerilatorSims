@@ -1,4 +1,4 @@
-name: CMake
+name: Gtest
 
 on:
   push:
@@ -7,7 +7,6 @@ on:
     branches: [ "main" ]
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
 
 jobs:
@@ -24,11 +23,17 @@ jobs:
         pacman -Syyu --noprogressbar --noconfirm
         pacman -S cmake git gtest verilator --noprogressbar --noconfirm
 
+    - name: Create build directory
+      run: mkdir build
+
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      working-directory: build
+      run: cmake ..
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      working-directory: build
+      run: make -j${nproc}
 
     - name: Test
-      run: ${{github.workspace}}/build/hdl
+      working-directory: build
+      run: ./hdl
