@@ -37,20 +37,21 @@ gtest_discover_tests(hdl)
 # For info: https://verilator.org/guide/latest/verilating.html
 # We need one verilate call for each "top level" module we would like to simulate
 
-# These are top level modules
+# These are top level modules for simulation
 set(sv_counter       "sv/counter.sv")
-set(sv_register_file "sv/register_file.sv")
 set(sv_icache        "sv/icache.sv")
-set(sv_tile_top      "sv/tile_top.sv" "sv/tile.sv" ${sv_icache} ${sv_register_file})
+set(sv_register_file "sv/register_file.sv")
+set(sv_tileIO_top    "sv/tileIO_top.sv" "sv/tileIO.sv")
+#set(sv_tile_top     "sv/tile_top.sv" "sv/tile.sv" ${sv_icache} ${sv_register_file} ${sv_tileIO})
 
 # This is a single list of all top level modules, so we can iterate over it below
-set(sv_top_modules sv_counter sv_register_file sv_icache sv_tile_top)
+set(sv_top_modules sv_counter sv_register_file sv_icache sv_tileIO_top)
 
 foreach(sv_top ${sv_top_modules})
   verilate(hdl
     INCLUDE_DIRS "sv/inc"
     SOURCES ${${sv_top}}
     TRACE
-    #VERILATOR_ARGS "--Wall"  # TODO: re-enable -Wall
+    VERILATOR_ARGS "--Wall"
   )
 endforeach()
