@@ -21,10 +21,10 @@ include_directories(cpp)
 
 add_executable(hdl
   /usr/share/verilator/include/verilated_vcd_c.cpp
-  cpp/counter/counter.cpp
-  cpp/icache/icache.cpp
+  cpp/counter.cpp
+  cpp/icache.cpp
   cpp/main.cpp
-  cpp/register_file/register_file.cpp
+  cpp/register_file.cpp
 )
 
 target_link_libraries(hdl
@@ -38,10 +38,10 @@ gtest_discover_tests(hdl)
 # We need one verilate call for each "top level" module we would like to simulate
 
 # These are top level modules
-set(sv_counter       "sv/counter/counter.sv")
-set(sv_register_file "sv/register_file/register_file.sv")
-set(sv_icache        "sv/icache/icache.sv")
-set(sv_tile_top      "sv/tile/tile_top.sv" "sv/tile/tile.sv" ${sv_icache} ${sv_register_file})
+set(sv_counter       "sv/counter.sv")
+set(sv_register_file "sv/register_file.sv")
+set(sv_icache        "sv/icache.sv")
+set(sv_tile_top      "sv/tile_top.sv" "sv/tile.sv" ${sv_icache} ${sv_register_file})
 
 # This is a single list of all top level modules, so we can iterate over it below
 set(sv_top_modules sv_counter sv_register_file sv_icache sv_tile_top)
