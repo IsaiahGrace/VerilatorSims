@@ -24,7 +24,30 @@ module tile (
     wire RF_write, RF_swap, RF_save;
     word RF_write_data;
 
+    // TileIO wires
+    location IO_loc;
+    word IO_send_data;
+    logic IO_send, IO_send_done;
+    word IO_recv_data;
+    logic IO_recv, IO_recv_valid;
+
     // Module instances:
+
+    tileIO TILEIO (
+        .clk(clk),
+        .nrst(nrst),
+        .up(up),
+        .down(down),
+        .left(left),
+        .right(right),
+        .loc(IO_loc),
+        .send_data(IO_send_data),
+        .send(IO_send),
+        .send_done(IO_send_done),
+        .recv_data(IO_recv_data),
+        .recv(IO_recv),
+        .recv_valid(IO_recv_valid)
+    );
 
     icache ICACHE (
         .clk(clk),

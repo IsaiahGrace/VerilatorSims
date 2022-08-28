@@ -23,6 +23,7 @@ add_executable(hdl
   cpp/icache.cpp
   cpp/main.cpp
   cpp/register_file.cpp
+  cpp/tileIO.cpp
   cpp/type_asserter.cpp
 )
 
@@ -47,12 +48,13 @@ gtest_discover_tests(hdl)
 set(sv_counter       "sv/counter.sv")
 set(sv_icache        "sv/icache.sv")
 set(sv_register_file "sv/register_file.sv")
-set(sv_tileIO_top    "sv/tileIO_top.sv" "sv/tileIO.sv")
-#set(sv_tile_top     "sv/tile_top.sv" "sv/tile.sv" ${sv_icache} ${sv_register_file} ${sv_tileIO})
+set(sv_tile          "sv/tile.sv")
+set(sv_tileIO        "sv/tileIO.sv")
 set(sv_type_asserter "sv/type_asserter.sv")
 
-# This is a single list of all top level modules, so we can iterate over it below
-set(sv_top_modules sv_counter sv_register_file sv_icache sv_tileIO_top)
+# Top level wrappers around interfaces (because verilator does not support top level interfaces)
+set(sv_tile_top   "sv/tile_top.sv"   ${sv/tile.sv} ${sv_icache} ${sv_register_file} ${sv_tileIO})
+set(sv_tileIO_top "sv/tileIO_top.sv" ${sv_tileIO})
 
 # This is a single list of all top level modules, so we can iterate over it below.
 # NOTE: This is a list of 'list names'. It is a 1D list of variable names, not a 2D list.
@@ -60,6 +62,7 @@ set(sv_top_modules
   sv_counter
   sv_icache
   sv_register_file
+  sv_tileIO_top
   sv_type_asserter
   )
 

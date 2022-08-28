@@ -16,7 +16,6 @@ typedef enum logic [2:0] {
     LOC_LAST  = 3'h7
 } location;
 
-
 typedef enum logic [3:0] {
     OP_NOP = 4'h0,  // NO-OP does nothing. Docs say it's assembled to ADD NIL. But I'm keeping it seperate
     OP_MOV = 4'h1,  // MOVE <SRC> -> <DST>. The MOV instruction is split into two: MOV & MVI.
