@@ -4,7 +4,7 @@
 `include "types.vh"
 
 // TODO: Add a register here to cut down the critical path
-interface tileAB_if;
+interface mesh_link_if;
     word  send_data_A,  send_data_B;
     logic send_ready_A, send_ready_B;
     logic send_done_A,  send_done_B;

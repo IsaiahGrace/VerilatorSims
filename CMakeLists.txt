@@ -4,10 +4,6 @@ project(hdl)
 Set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVL_DEBUG")
-
-find_package(verilator REQUIRED)
-
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -17,6 +13,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 enable_testing()
 
+find_package(verilator REQUIRED)
+
 include_directories(cpp)
 
 add_executable(hdl
@@ -25,6 +23,14 @@ add_executable(hdl
   cpp/icache.cpp
   cpp/main.cpp
   cpp/register_file.cpp
+  cpp/type_asserter.cpp
+)
+
+target_compile_options(hdl PRIVATE
+  -Werror
+  -Wall
+  -Wextra
+  -DVL_DEBUG
 )
 
 target_link_libraries(hdl PUBLIC
@@ -43,15 +49,32 @@ set(sv_icache        "sv/icache.sv")
 set(sv_register_file "sv/register_file.sv")
 set(sv_tileIO_top    "sv/tileIO_top.sv" "sv/tileIO.sv")
 #set(sv_tile_top     "sv/tile_top.sv" "sv/tile.sv" ${sv_icache} ${sv_register_file} ${sv_tileIO})
+set(sv_type_asserter "sv/type_asserter.sv")
 
 # This is a single list of all top level modules, so we can iterate over it below
 set(sv_top_modules sv_counter sv_register_file sv_icache sv_tileIO_top)
+
+# This is a single list of all top level modules, so we can iterate over it below.
+# NOTE: This is a list of 'list names'. It is a 1D list of variable names, not a 2D list.
+set(sv_top_modules
+  sv_counter
+  sv_icache
+  sv_register_file
+  sv_type_asserter
+  )
 
 foreach(sv_top ${sv_top_modules})
   verilate(hdl
     INCLUDE_DIRS "sv/inc"
     SOURCES ${${sv_top}}
     TRACE
-    VERILATOR_ARGS "--Wall"
+    VERILATOR_ARGS "--Wall" "--assert"
   )
 endforeach()
+
+# For debugging: print out all cmake variables and their values
+# get_cmake_property(_variableNames VARIABLES)
+# list (SORT _variableNames)
+# foreach (_variableName ${_variableNames})
+#    message(STATUS "${_variableName}=${${_variableName}}")
+# endforeach()
