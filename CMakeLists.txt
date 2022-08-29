@@ -23,6 +23,7 @@ add_executable(hdl
   cpp/icache.cpp
   cpp/main.cpp
   cpp/register_file.cpp
+  #cpp/tile.cpp
   cpp/tileIO.cpp
   cpp/type_asserter.cpp
 )
@@ -31,6 +32,7 @@ target_compile_options(hdl PRIVATE
   -Werror
   -Wall
   -Wextra
+  -Wno-missing-field-initializers
   -DVL_DEBUG
 )
 

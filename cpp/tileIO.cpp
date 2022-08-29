@@ -25,26 +25,26 @@ class TileIO: public Testbench<VtileIO_top> {
 
     struct TileIF {
         // Module inputs:
-        Word recv_data;
-        Logic recv_valid;
-        Logic send_done;
+        Word  in_recv_data;
+        Logic in_recv_valid;
+        Logic in_send_done;
 
         // Module outputs:
-        std::optional<Word> send_data;
-        std::optional<Logic> send_ready;
-        std::optional<Logic> recv_ready;
+        std::optional<Word>  out_send_data;
+        std::optional<Logic> out_send_ready;
+        std::optional<Logic> out_recv_ready;
     };
 
     struct TileIOInput {
-        Location loc;
+        Location in_loc;
 
-        Word send_data;
-        Logic send;
-        std::optional<Logic> send_done;
+        Word in_send_data;
+        Logic in_send;
+        std::optional<Logic> out_send_done;
 
-        std::optional<Word> recv_data;
-        Logic recv;
-        std::optional<Logic> recv_valid;
+        std::optional<Word> out_recv_data;
+        Logic in_recv;
+        std::optional<Logic> out_recv_valid;
 
         TileIF up, down, left, right;
     };
@@ -52,50 +52,50 @@ class TileIO: public Testbench<VtileIO_top> {
 
     void applyInput(const TileIOInput& input) {
         // Drive module inputs
-        dev->loc = input.loc;
-        dev->send = input.send;
-        dev->recv = input.recv;
-        dev->send_data = input.send_data;
+        dev->loc = input.in_loc;
+        dev->send = input.in_send;
+        dev->recv = input.in_recv;
+        dev->send_data = input.in_send_data;
 
-        dev->up_send_done  = input.up.send_done;
-        dev->up_recv_data  = input.up.recv_data;
-        dev->up_recv_valid = input.up.recv_valid;
+        dev->up_send_done  = input.up.in_send_done;
+        dev->up_recv_data  = input.up.in_recv_data;
+        dev->up_recv_valid = input.up.in_recv_valid;
 
-        dev->down_send_done  = input.down.send_done;
-        dev->down_recv_data  = input.down.recv_data;
-        dev->down_recv_valid = input.down.recv_valid;
+        dev->down_send_done  = input.down.in_send_done;
+        dev->down_recv_data  = input.down.in_recv_data;
+        dev->down_recv_valid = input.down.in_recv_valid;
 
-        dev->left_send_done  = input.left.send_done;
-        dev->left_recv_data  = input.left.recv_data;
-        dev->left_recv_valid = input.left.recv_valid;
+        dev->left_send_done  = input.left.in_send_done;
+        dev->left_recv_data  = input.left.in_recv_data;
+        dev->left_recv_valid = input.left.in_recv_valid;
 
-        dev->right_send_done  = input.right.send_done;
-        dev->right_recv_data  = input.right.recv_data;
-        dev->right_recv_valid = input.right.recv_valid;
+        dev->right_send_done  = input.right.in_send_done;
+        dev->right_recv_data  = input.right.in_recv_data;
+        dev->right_recv_valid = input.right.in_recv_valid;
 
         // Simulate a clock cycle
         tick();
 
         // Verify module outputs (only if expectations exist)
-        if (input.send_done)  {EXPECT_EQ(input.send_done, dev->send_done);}
-        if (input.recv_data)  {EXPECT_EQ(input.recv_data, dev->recv_data);}
-        if (input.recv_valid) {EXPECT_EQ(input.recv_valid, dev->recv_valid);}
+        if (input.out_send_done)  {EXPECT_EQ(input.out_send_done, dev->send_done);}
+        if (input.out_recv_data)  {EXPECT_EQ(input.out_recv_data, dev->recv_data);}
+        if (input.out_recv_valid) {EXPECT_EQ(input.out_recv_valid, dev->recv_valid);}
 
-        if (input.up.send_data)  {EXPECT_EQ(input.up.send_data,  dev->up_send_data);}
-        if (input.up.send_ready) {EXPECT_EQ(input.up.send_ready, dev->up_send_ready);}
-        if (input.up.recv_ready) {EXPECT_EQ(input.up.recv_ready, dev->up_recv_ready);}
+        if (input.up.out_send_data)  {EXPECT_EQ(input.up.out_send_data,  dev->up_send_data);}
+        if (input.up.out_send_ready) {EXPECT_EQ(input.up.out_send_ready, dev->up_send_ready);}
+        if (input.up.out_recv_ready) {EXPECT_EQ(input.up.out_recv_ready, dev->up_recv_ready);}
 
-        if (input.down.send_data)  {EXPECT_EQ(input.down.send_data,  dev->down_send_data);}
-        if (input.down.send_ready) {EXPECT_EQ(input.down.send_ready, dev->down_send_ready);}
-        if (input.down.recv_ready) {EXPECT_EQ(input.down.recv_ready, dev->down_recv_ready);}
+        if (input.down.out_send_data)  {EXPECT_EQ(input.down.out_send_data,  dev->down_send_data);}
+        if (input.down.out_send_ready) {EXPECT_EQ(input.down.out_send_ready, dev->down_send_ready);}
+        if (input.down.out_recv_ready) {EXPECT_EQ(input.down.out_recv_ready, dev->down_recv_ready);}
 
-        if (input.left.send_data)  {EXPECT_EQ(input.left.send_data,  dev->left_send_data);}
-        if (input.left.send_ready) {EXPECT_EQ(input.left.send_ready, dev->left_send_ready);}
-        if (input.left.recv_ready) {EXPECT_EQ(input.left.recv_ready, dev->left_recv_ready);}
+        if (input.left.out_send_data)  {EXPECT_EQ(input.left.out_send_data,  dev->left_send_data);}
+        if (input.left.out_send_ready) {EXPECT_EQ(input.left.out_send_ready, dev->left_send_ready);}
+        if (input.left.out_recv_ready) {EXPECT_EQ(input.left.out_recv_ready, dev->left_recv_ready);}
 
-        if (input.right.send_data)  {EXPECT_EQ(input.right.send_data,  dev->right_send_data);}
-        if (input.right.send_ready) {EXPECT_EQ(input.right.send_ready, dev->right_send_ready);}
-        if (input.right.recv_ready) {EXPECT_EQ(input.right.recv_ready, dev->right_recv_ready);}
+        if (input.right.out_send_data)  {EXPECT_EQ(input.right.out_send_data,  dev->right_send_data);}
+        if (input.right.out_send_ready) {EXPECT_EQ(input.right.out_send_ready, dev->right_send_ready);}
+        if (input.right.out_recv_ready) {EXPECT_EQ(input.right.out_recv_ready, dev->right_recv_ready);}
     }
 
     void applyInputs(const std::vector<TileIOInput>& inputs) {
@@ -107,4 +107,89 @@ class TileIO: public Testbench<VtileIO_top> {
 
 TEST_F(TileIO, reset) {
     reset();
+    TileIOInput input = {};
+    input.out_recv_data = 0;
+    input.out_recv_valid = 0;
+
+    input.up.out_send_ready = 0;
+    input.up.out_send_data = 0;
+    input.up.out_recv_ready = 0;
+
+    input.down.out_send_ready = 0;
+    input.down.out_send_data = 0;
+    input.down.out_recv_ready = 0;
+
+    input.left.out_send_ready = 0;
+    input.left.out_send_data = 0;
+    input.left.out_recv_ready = 0;
+
+    input.right.out_send_ready = 0;
+    input.right.out_send_data = 0;
+    input.right.out_recv_ready = 0;
+
+    applyInput(input);
+}
+
+TEST_F(TileIO, WriteToUP) {
+    reset();
+
+    std::vector<TileIOInput> inputs = {{
+        .in_loc = LOC_UP, .in_send_data = 0xab, .in_send = 1, .out_send_done = 0,
+            .up = {
+                .in_send_done = 0,
+                .out_send_data = 0xab,
+                .out_send_ready = 1,
+                .out_recv_ready = 0
+            }
+        }, {
+        .in_loc = LOC_UP, .in_send_data = 0xab, .in_send = 1, .out_send_done = 1,
+            .up = {
+                .in_send_done = 1,
+                .out_send_data = 0xab,
+                .out_send_ready = 1,
+                .out_recv_ready = 0
+            }
+        }, {
+        .in_loc = LOC_UP, .in_send_data = 0xab, .in_send = 0, .out_send_done = 0,
+            .up = {
+                .in_send_done = 0,
+                .out_send_data = 0xab,
+                .out_send_ready = 0,
+                .out_recv_ready = 0
+            }
+        }
+    };
+    applyInputs(inputs);
+}
+
+TEST_F(TileIO, WriteToNil) {
+    reset();
+
+    std::vector<TileIOInput> inputs = {{
+        .in_loc = LOC_NIL, .in_send_data = 0xff, .in_send = 1, .out_send_done = 1,
+            .up = {
+                .in_send_done = 0,
+                .out_send_data = 0xff, // When NIL is selected, TileIO connects the data to
+                .out_send_ready = 0,
+                .out_recv_ready = 0
+            }
+        }, {
+        .in_loc = LOC_UP, .in_send_data = 0xab, .in_send = 1, .out_send_done = 1,
+            .up = {
+                .in_send_done = 1,
+                .out_send_data = 0xab,
+                .out_send_ready = 1,
+                .out_recv_ready = 0
+            }
+        }, {
+        .in_loc = LOC_UP, .in_send_data = 0xab, .in_send = 0, .out_send_done = 0,
+            .up = {
+                .in_send_done = 0,
+                .out_send_data = 0xab,
+                .out_send_ready = 0,
+                .out_recv_ready = 0
+            }
+        }
+    };
+    applyInputs(inputs);
 }

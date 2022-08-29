@@ -78,7 +78,7 @@ class Icache: public Testbench<Vicache> {
     }
 };
 
-TEST_F(Icache, resetIcache) {
+TEST_F(Icache, reset) {
     reset();
 
     // Read from each address
