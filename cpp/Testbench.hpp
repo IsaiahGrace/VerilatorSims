@@ -46,7 +46,6 @@ class Testbench: public ::testing::Test {
         // Generate a trace at the begining of time.
         dev->clk = 1;
         dev->eval();
-        vcd->dump(context->time());
 
         tickCount = 0;
     }
